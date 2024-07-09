@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 91 27">
+  <style>path { stroke: black; } @media (prefers-color-scheme: dark) { path { stroke: white; } }</style>
+  <defs>
+    <marker id="c" markerHeight="5.5" markerWidth="5.5" orient="auto" overflow="visible" preserveAspectRatio="xMidYMid" refX="0" refY="0" viewBox="0 0 6 6">
+      <path fill="context-stroke" fill-rule="evenodd" stroke="context-stroke" stroke-width=".7" d="M3 0a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+    </marker>
+    <marker id="a" markerHeight="9.4" markerWidth="9.4" orient="auto" overflow="visible" preserveAspectRatio="xMidYMid" refX="-2.3" refY="0" viewBox="0 0 5 5">
+      <path fill="context-fill" fill-rule="evenodd" stroke="context-stroke" d="M2 0a2 2 0 1 1-4 0 2 2 0 0 1 4 0z"/>
+    </marker>
+    <marker id="b" markerHeight="3.9" markerUnits="strokeWidth" markerWidth="6.8" orient="auto-start-reverse" overflow="visible" preserveAspectRatio="xMidYMid" refX="5.5" refY="0" viewBox="0 0 9 5">
+      <path fill="context-stroke" fill-rule="evenodd" d="m0 0-2 3 8-3-8-2Z"/>
+    </marker>
+  </defs>
+  <g fill="none" stroke="#000" stroke-linecap="round" stroke-width=".4">
+    <path marker-end="url(#a)" d="m102 55-3 1" transform="translate(-14 -43)"/>
+    <path stroke-dasharray="0 1" marker-end="url(#b)" d="m96 50 6 5" transform="translate(-14 -43)"/>
+    <path stroke-dasharray="0 1" marker-end="url(#b)" d="m92 64 4-14" transform="translate(-14 -43)"/>
+    <path marker-end="url(#b)" d="m103 68-11-4" transform="translate(-14 -43)"/>
+    <path marker-end="url(#b)" d="M103 46v22" transform="translate(-14 -43)"/>
+    <path marker-end="url(#b)" d="M91 46h12" transform="translate(-14 -43)"/>
+    <path marker-end="url(#b)" d="M91 68V46" transform="translate(-14 -43)"/>
+    <path stroke-dasharray="0 1" marker-end="url(#b)" d="M73 68h18" transform="translate(-14 -43)"/>
+    <path marker-end="url(#b)" d="m86 61-13 7" transform="translate(-14 -43)"/>
+    <path marker-end="url(#b)" d="m73 56 13 5" transform="translate(-14 -43)"/>
+    <path marker-end="url(#b)" d="m87 53-14 3" transform="translate(-14 -43)"/>
+    <path marker-end="url(#b)" d="m74 46 13 7" transform="translate(-14 -43)"/>
+    <path marker-end="url(#b)" d="m72 68 2-22" transform="translate(-14 -43)"/>
+    <path marker-end="url(#b)" d="m53 46 3 17 1-17 6 19-2-19 11 22" transform="translate(-14 -43)"/>
+    <path marker-end="url(#b)" d="m49 60 4-14" transform="translate(-14 -43)"/>
+    <path marker-end="url(#b)" d="m37 57 12 3" transform="translate(-14 -43)"/>
+    <path stroke-dasharray="0 1" marker-end="url(#b)" d="M49 69 37 57" transform="translate(-14 -43)"/>
+    <path marker-end="url(#b)" d="m41 46 8 23" transform="translate(-14 -43)"/>
+    <path marker-end="url(#b)" d="m34 64 7-18" transform="translate(-14 -43)"/>
+    <path stroke-dasharray="0 1" marker-end="url(#b)" d="m14 68 20-4" transform="translate(-14 -43)"/>
+    <path marker-end="url(#b)" d="m31 69-17-1" transform="translate(-14 -43)"/>
+    <path marker-end="url(#b)" d="m30 56 1 13" transform="translate(-14 -43)"/>
+    <path marker-end="url(#b)" d="m16 57 14-1" transform="translate(-14 -43)"/>
+    <path marker-end="url(#b)" d="m17 45-1 12" transform="translate(-14 -43)"/>
+    <path marker-end="url(#b)" marker-start="url(#c)" d="m31 44-14 1" transform="translate(-14 -43)"/>
+  </g>
+</svg>
