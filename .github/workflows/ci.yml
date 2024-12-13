@@ -42,4 +42,4 @@ jobs:
         run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
 
       - run: pip install -U pip setuptools wheel pdoc3 && pip install -e .[all]
-      - run: time .github/scripts/build.sh
+      - run: time .github/scripts/build-docs.sh

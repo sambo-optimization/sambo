@@ -1,7 +1,8 @@
 name: Deploy docs
 on:
   push:
-    tags: [ v* ]
+    tags: ['v[0-9]+.*']
+  workflow_dispatch:
 
 jobs:
   deploy:
@@ -14,11 +15,12 @@ jobs:
         run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
       - uses: ./.github/actions/setup
         with:
-          python-version: 3.13
+          python-version: 3.12
 
       - run: pip install -e .[all] pdoc3
-      - run: time .github/scripts/build.sh
+      - run: python -m sambo._test -v
+      - run: time .github/scripts/build-docs.sh
 
       - env:
-          GH_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+          GH_PASSWORD: ${{ secrets.GH_PASSWORD }}
         run: .github/scripts/deploy-gh-pages.sh
