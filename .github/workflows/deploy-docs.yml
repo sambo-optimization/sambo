@@ -1,0 +1,24 @@
+name: Deploy docs
+on:
+  push:
+    tags: [ v* ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 3
+      - name: Fetch tags
+        run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+      - uses: ./.github/actions/setup
+        with:
+          python-version: 3.13
+
+      - run: pip install -e .[all] pdoc3
+      - run: time .github/scripts/build.sh
+
+      - env:
+          GH_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+        run: .github/scripts/deploy-gh-pages.sh

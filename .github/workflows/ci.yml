@@ -1,0 +1,45 @@
+name: CI
+on:
+  push: { branches: [master] }
+  pull_request: { branches: [master] }
+  schedule: [ cron: '11 3 7 * *' ]
+
+jobs:
+  test-matrix:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.10', '>=3']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: pip install -U pip setuptools wheel && pip install -U --pre .[all]
+      - run: time python -m unittest -v sambo._test
+
+  lint-test-coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+        with:
+          python-version: 3.13
+      - run: pip install -U pip setuptools wheel && pip install -U .[all]
+      - run: pip install flake8 coverage
+      - run: flake8 sambo benchmark setup.py
+      - run: time coverage run -m unittest -v sambo._test
+      - run: coverage report
+
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+        with:
+          python-version: 3.13
+      - name: Fetch tags
+        run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+
+      - run: pip install -U pip setuptools wheel pdoc3 && pip install -e .[all]
+      - run: time .github/scripts/build.sh
