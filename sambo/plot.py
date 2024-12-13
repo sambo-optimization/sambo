@@ -64,7 +64,7 @@ def plot_convergence(
 
     Example
     -------
-    .. image:: convergence.svg
+    .. image:: /convergence.svg
     """
     assert results, results
 
@@ -158,7 +158,7 @@ def plot_regret(
 
     Example
     -------
-    .. image:: regret.svg
+    .. image:: /regret.svg
     """
     assert results, results
 
@@ -567,7 +567,7 @@ def plot_objective(
 
     Example
     -------
-    .. image:: objective.svg
+    .. image:: /objective.svg
     """
     result = _check_result(result)
     space = _check_space(result)
@@ -707,7 +707,7 @@ def plot_evaluations(
 
     Example
     -------
-    .. image:: evaluations.svg
+    .. image:: /evaluations.svg
     """
     result = _check_result(result)
     space = _check_space(result)
