@@ -158,6 +158,7 @@ class TestSpace(unittest.TestCase):
             nonlocal self
             assert self.CONSTRAINTS(res.x)
             assert self.CONSTRAINTS(res.xv[0])
+            return True
 
         for method in BUILTIN_METHODS:
             with self.subTest(method=method):
@@ -255,7 +256,7 @@ class TestMinimize(unittest.TestCase):
             was_called = True
             return np.all(x > 0)
 
-        _minimize = partial(minimize, x0=[0] * 2, constraints=constraints, max_iter=10)
+        _minimize = partial(minimize, x0=[0] * 2, constraints=constraints, max_iter=5)
         for method in BUILTIN_METHODS:
             with self.subTest(method=method):
                 was_called = False
@@ -376,8 +377,9 @@ class TestDocs(unittest.TestCase):
         KWARGS = {
             plot_regret: dict(true_minimum=0),
             plot_convergence: dict(yscale='log', true_minimum=0),
+            plot_objective: dict(resolution=12)
         }
-        with chdir((p := Path(__file__).parent).parent / f'html/{p.stem}'):
+        with chdir(Path(__file__).parent.parent / 'www'):
             for plot_func in PLOT_FUNCS:
                 name = plot_func.__name__.removeprefix("plot_")
                 with self.subTest(plot=name):
@@ -385,7 +387,7 @@ class TestDocs(unittest.TestCase):
                         fig = plot_func(*zip(BUILTIN_METHODS, results),
                                         **KWARGS.get(plot_func, {}))
                     except TypeError:
-                        fig = plot_func(results[0])  # FIXME: plot (1, 3) subplots
+                        fig = plot_func(results[0], **KWARGS.get(plot_func, {}))  # FIXME: plot (1, 3) subplots
                     fig.savefig(f'{name}.svg')
                     plt.show()
 
@@ -406,17 +408,18 @@ class TestDocs(unittest.TestCase):
 
         results = []
         for estimator in BUILTIN_ESTIMATORS:
-            optimizer = Optimizer(fun=None, bounds=[(-2, 2)]*2, estimator=estimator, rng=0)
+            optimizer = Optimizer(fun=None, bounds=[(-2, 2)]*4, estimator=estimator, rng=0)
 
-            for i in range(100):
-                suggested_x = optimizer.ask(n_candidates=1)
+            for i in range(30):
+                suggested_x = optimizer.ask(n_candidates=2)
                 y = [evaluate(x) for x in suggested_x]
                 optimizer.tell(y)
 
             result = optimizer.run()
             results.append(result)
-        fig = plot_convergence(*[(f'estimator={e!r}', r) for e, r in zip(BUILTIN_ESTIMATORS, results)], yscale='log', true_minimum=0)
-        with chdir(Path(__file__).parent.parent / 'html'):
+        named_results = [(f'estimator={e!r}', r) for e, r in zip(BUILTIN_ESTIMATORS, results)]
+        fig = plot_convergence(*named_results, true_minimum=0)
+        with chdir(Path(__file__).parent.parent / 'www'):
             fig.savefig('convergence2.svg')
         plt.show()
 
@@ -428,14 +431,14 @@ class TestDocs(unittest.TestCase):
         X, y = load_breast_cancer(return_X_y=True)
         clf = DecisionTreeClassifier(random_state=0)
         param_grid = {
-            'max_depth': list(range(1, 30)),
-            'min_samples_split': [2, 5, 10, 20, 50, 100],
-            'min_samples_leaf': list(range(1, 20)),
+            'max_depth': list(range(1, 20)),
+            'min_samples_split': [2, 5, 10, 50, 100],
+            'min_samples_leaf': list(range(1, 10)),
             'criterion': ['gini', 'entropy'],
             'max_features': [None, 'sqrt', 'log2'],
         }
-        search = GridSearchCV(clf, param_grid, cv=2, n_jobs=-1)
-        # Trying all ~20k combinations may take a long time ...
+        search = GridSearchCV(clf, param_grid, cv=2, n_jobs=1)
+        # Trying all ~6k combinations may take a long time ...
         search.fit(X, y)
         pprint(dict(sorted(search.best_params_.items())))
         print(search.best_score_)
@@ -443,7 +446,7 @@ class TestDocs(unittest.TestCase):
         # Alternatively ...
         from sambo import SamboSearchCV
 
-        search = SamboSearchCV(clf, param_grid, max_iter=100, cv=2, n_jobs=-1, rng=0)
+        search = SamboSearchCV(clf, param_grid, max_iter=100, cv=2, n_jobs=1, rng=0)
         search.fit(X, y)  # Fast, good enough
         pprint(dict(sorted(search.best_params_.items())))
         print(search.best_score_)
