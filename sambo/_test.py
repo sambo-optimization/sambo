@@ -379,7 +379,9 @@ class TestDocs(unittest.TestCase):
             plot_convergence: dict(yscale='log', true_minimum=0),
             plot_objective: dict(resolution=12)
         }
-        with chdir(Path(__file__).parent.parent / 'www'):
+        www_dir = Path(__file__).parent.parent / 'www'
+        www_dir.mkdir(exist_ok=True)
+        with chdir(www_dir):
             for plot_func in PLOT_FUNCS:
                 name = plot_func.__name__.removeprefix("plot_")
                 with self.subTest(plot=name):
@@ -419,7 +421,9 @@ class TestDocs(unittest.TestCase):
             results.append(result)
         named_results = [(f'estimator={e!r}', r) for e, r in zip(BUILTIN_ESTIMATORS, results)]
         fig = plot_convergence(*named_results, true_minimum=0)
-        with chdir(Path(__file__).parent.parent / 'www'):
+        www_dir = Path(__file__).parent.parent / 'www'
+        www_dir.mkdir(exist_ok=True)
+        with chdir(www_dir):
             fig.savefig('convergence2.svg')
         plt.show()
 
