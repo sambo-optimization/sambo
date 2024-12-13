@@ -1,6 +1,6 @@
 """
-The module contains functions for plotting convergence, regret,
-partial dependence, sequence of evaluations ...
+The module contains **functions for plotting**
+convergence, regret, partial dependence, sequence of evaluations ...
 
 Example
 -------

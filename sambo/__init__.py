@@ -10,15 +10,15 @@ so it's important to find good-enough solutions in
 
 The main tools in this Python optimization toolbox are:
 
-* **function `sambo.minimize()`**, a drop-in replacement for [`scipy.optimize.minimize()`][sp_opt_min],
+* **function `sambo.minimize()`**, a near drop-in replacement for [`scipy.optimize.minimize()`][sp_opt_min],
 * **class `Optimizer`** with an ask-and-tell user interface,
   supporting arbitrary scikit-learn-like surrogate models,
-  with Bayesian optimization estimators like [gaussian process], [extra trees],
-  and [kernel ridge regression] built in,
+  with Bayesian optimization estimators like [gaussian process] and [extra trees],
+  built in,
 * **`SamboSearchCV`**, a much faster drop-in replacement for
   scikit-learn's [`GridSearchCV`][skl_gridsearchcv] and similar exhaustive
   machine-learning hyper-parameter tuning methods,
-  but compared to stochastic methods, precise.
+  but compared to unpredictable stochastic methods, _informed_.
 
 The algorithms and methods implemented by or used in this package are:
 
@@ -35,8 +35,8 @@ which now seems helplessly defunct.
 
 The project is one of the better optimizers around according to [benchmark].
 
-\N{DAGGER} The contained algorithms seek _minimums_ of your objective `f(x)`.
-If you instead want to find the _maximum_, simply minimize `-f(x)`. 💡
+\N{DAGGER} The contained algorithms seek to _minimize_ your objective `f(x)`.
+If you instead need the _maximum_, simply minimize `-f(x)`. 💡
 
 [gaussian process]: https://www.gaussianprocess.org/gpml/chapters/RW.pdf
 [extra trees]: https://doi.org/10.1007/s10994-006-6226-1
