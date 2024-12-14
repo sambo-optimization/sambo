@@ -54,7 +54,7 @@ TEST_FUNCTIONS = [
         'bounds': [[-1.25, 1.25], [-1.25, 1.25]],
         'tol': .03,
         'solution': -0.072,
-        'codomain': [-0.088, 0.072],
+        'codomain': [-0.072, 0.072],
     },
     {
         'name': 'rastrigin',

@@ -4,6 +4,7 @@ from contextlib import redirect_stdout
 from itertools import groupby
 
 import hyperopt
+import nevergrad
 import numpy as np
 import scipy
 import scipy.optimize as scipy_optimize
@@ -84,6 +85,8 @@ def main():
         ('scikit-learn', sklearn.__version__),
         ('scikit-optimize', skopt.__version__),
         ('hyperopt', hyperopt.__version__),
+        ('nevergrad', nevergrad.__version__),
+        ('sambo', sambo.__version__),
     ]:
         print(pkg, version)
     print()
@@ -114,13 +117,14 @@ def main():
     sys.stderr.flush()
     sys.stdout.flush()
 
+    def method_note(method):
+        is_nonconstrained = method in SCIPY_OPTIMIZE_NONCONSTRAINED_METHODS or IS_NONCONSTRAINED(method)
+        return ' \N{DAGGER}' if is_nonconstrained else ''
+
     header = f'{"Test function":24s}\t{"Method":24s}\tN Evals\tError %\tDuration'.expandtabs(4)
     print(header, '—'*len(header), sep='\n')
     for r in sorted(results, key=lambda r: (r['func'], r['error'], r['nfev'], r['method'])):
-        is_nonconstrained = (r['method'] in SCIPY_OPTIMIZE_NONCONSTRAINED_METHODS or
-                             IS_NONCONSTRAINED(r['method']))
-        note = '\N{DAGGER}' if is_nonconstrained else ''
-        print(f"{r['func']:24s}\t{r['method'] + note:24s}\t{str(r['nfev']):>6s}{('' if r['success'] else '*')}\t{r['error']:7d}\t{r['duration']:5.2f}".expandtabs(4))  # noqa: E501
+        print(f"{r['func']:24s}\t{r['method'] + method_note(r['method']):24s}\t{str(r['nfev']):>6s}{('' if r['success'] else '*')}\t{r['error']:7d}\t{r['duration']:5.2f}".expandtabs(4))  # noqa: E501
 
     print('\n')
 
@@ -139,7 +143,7 @@ def main():
               )
              for k, g in [(k, list(g)) for k, g in groupby(sorted(results, key=key_func), key=key_func)]],
             key=lambda g: (-g[2], g[1], g[3])):
-        print(f"{method:24s}\t{success_pct:6d}%\t{nfev:7d}\t{error:7d}\t{duration:8.2f}".expandtabs(4))
+        print(f"{method + method_note(method):24s}\t{success_pct:6d}%\t{nfev:7d}\t{error:7d}\t{duration:8.2f}".expandtabs(4))  # noqa:E501
 
     print('\n')
     print('* Did not finish / unexpected result.\n'
