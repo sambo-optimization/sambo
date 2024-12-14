@@ -78,9 +78,9 @@ TEST_FUNCTIONS = [
     },
     {
         'name': '6-hump-camelback',
-        'func': lambda x: (4 - 2.1*x[0]**2 + x[0]**4 + x[0]**4/3)*x[0]**2 + x[0]*x[1] + (-4 + 4*x[1]**2)*x[1]**2,
+        'func': lambda x: (4 - 2.1*x[0]**2 + x[0]**4/3)*x[0]**2 + x[0]*x[1] + (-4 + 4*x[1]**2)*x[1]**2,
         'constraints': None,
-        'bounds': [[-3., 2.9], [-1.9, 2.]],
+        'bounds': [[-2., 2.], [-1., 1.]],
         'tol': 1,
         'solution': -1.0317,
         'codomain': [-1.0317, 891.9],
