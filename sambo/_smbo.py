@@ -293,7 +293,7 @@ class Optimizer:
 
         acq_func : Callable, default ACQ_FUNCS['UCB']
             Acquisition function used to guide the selection of candidate solutions.
-            By default, upper confidence bound (i.e. `mean + kappa * std` where `mean`
+            By default, upper confidence bound (i.e. `mean - kappa * std` where `mean`
             and `std` are surrogate models' predicted results).
 
             .. tip::
@@ -305,7 +305,7 @@ class Optimizer:
 
         kappa : float or list[float], default 0
             The upper/lower-confidence-bound parameter, used by `acq_func`, that
-            balances exploration vs exploitation.
+            balances exploration (<0) vs exploitation (>0).
 
             Can also be an array of values to use sequentially for `n_cadidates`.
 
