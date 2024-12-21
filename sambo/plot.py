@@ -32,6 +32,7 @@ from ._space import Space
 from ._util import OptimizeResult, _SklearnLikeRegressor
 
 _MARKER_SEQUENCE = 'osxdvP^'
+_DEFAULT_SUBPLOT_SIZE = 2.1
 
 
 def plot_convergence(
@@ -245,7 +246,7 @@ def _format_scatter_plot_axes(fig, axs, space, plot_dims=None, dim_labels=None, 
     if dim_labels is None:
         dim_labels = [fr"$\mathbf{{x_{{{i}}}}}$" for i in plot_dims]
 
-    nticks = int((1 + np.log10(size / (base_figsize := 2))) * (base_nticks := 6))  # noqa: F841
+    nticks = int((1 + np.log10(size / (base_figsize := _DEFAULT_SUBPLOT_SIZE))) * (base_nticks := 6))  # noqa: F841
     fontsize = 10
 
     _MaxNLocator = partial(MaxNLocator, nbins=nticks)
@@ -441,9 +442,9 @@ def _subplots_grid(n_dims, size, title):
     _watermark(fig)
     if add_figure_title:
         fig.suptitle(title)
-    margins = dict(left=(m := 3 / n_dims * size / 2 * .07), bottom=m, right=1 - m,
+    margins = dict(left=(m := 3 / n_dims * size / _DEFAULT_SUBPLOT_SIZE * .07), bottom=m, right=1 - m,
                    top=1 - (2 if add_figure_title else 1.1) * m)
-    fig.subplots_adjust(**margins, hspace=.15, wspace=.15)
+    fig.subplots_adjust(**margins, hspace=.1, wspace=.1)
     return fig, axs
 
 
@@ -469,7 +470,7 @@ def plot_objective(
         resolution: int = 16,
         n_samples: int = 250,
         estimator: Optional[str | _SklearnLikeRegressor] = None,
-        size: float = 2,
+        size: float = _DEFAULT_SUBPLOT_SIZE,
         zscale: Literal['linear', 'log'] = 'linear',
         names: Optional[list[str]] = None,
         true_minimum: Optional[list[float] | list[list[float]]] = None,
@@ -608,8 +609,9 @@ def plot_objective(
     if estimator is None and result_estimator is not None:
         estimator = result_estimator
     else:
+        _estimator_arg = estimator
         estimator = _estimator_factory(estimator, bounds, rng=0)
-        if result_estimator is None:
+        if result_estimator is None and _estimator_arg is None:
             warnings.warn(
                 'The optimization result process does not appear to have been '
                 'driven by a model. You can still still observe partial dependence '
@@ -653,7 +655,7 @@ def plot_evaluations(
         names: Optional[list[str]] = None,
         plot_dims: Optional[list[int]] = None,
         jitter: float = .02,
-        size: int = 2,
+        size: int = _DEFAULT_SUBPLOT_SIZE,
         cmap: str = 'summer',
 ) -> Figure:
     """Visualize the order in which points were evaluated during optimization.
