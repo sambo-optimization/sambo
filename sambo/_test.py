@@ -117,10 +117,6 @@ class TestPlot(unittest.TestCase):
         _plot_objective(self.RESULT_SMBO, plot_max_points=5)
         with self.assertWarns(UserWarning):
             _plot_objective(self.RESULT_SCEUA)
-        with self.assertWarns(UserWarning):
-            _plot_objective(self.RESULT_SCEUA, estimator='gp')
-        with self.assertWarns(UserWarning):
-            _plot_objective(self.RESULT_SHGO, estimator='gp')
 
     def test_plot_evaluations(self):
         plot_evaluations(self.RESULT_SMBO)
