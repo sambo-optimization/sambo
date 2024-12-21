@@ -386,7 +386,7 @@ class TestDocs(unittest.TestCase):
                 name = plot_func.__name__.removeprefix("plot_")
                 with self.subTest(plot=name):
                     try:
-                        fig = plot_func(*zip(BUILTIN_METHODS, results),
+                        fig = plot_func(*zip((f'method={m!r}' for m in BUILTIN_METHODS), results),
                                         **KWARGS.get(plot_func, {}))
                     except TypeError:
                         fig = plot_func(results[0], **KWARGS.get(plot_func, {}))  # FIXME: plot (1, 3) subplots
@@ -419,7 +419,7 @@ class TestDocs(unittest.TestCase):
 
             result = optimizer.run()
             results.append(result)
-        named_results = [(f'estimator={e!r}', r) for e, r in zip(BUILTIN_ESTIMATORS, results)]
+        named_results = [(f"method='smbo', estimator={e!r}", r) for e, r in zip(BUILTIN_ESTIMATORS, results)]
         fig = plot_convergence(*named_results, true_minimum=0)
         www_dir = Path(__file__).parent.parent / 'www'
         www_dir.mkdir(exist_ok=True)
