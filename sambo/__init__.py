@@ -48,6 +48,10 @@ from ._minimize import minimize
 from ._smbo import Optimizer
 from ._estimators import SamboSearchCV
 from ._util import OptimizeResult
+try:
+    from ._version import __version__
+except ImportError:
+    __version__ = '0.0.0-dev'
 
 __all__ = [
     'minimize',
