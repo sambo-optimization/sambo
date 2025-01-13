@@ -141,7 +141,7 @@ def minimize(
         Additional optional parameters to pass to optimization function.
         Popular options are:
 
-        * for `method="shgo"`: `n_init` (number of initial points),
+        * for `method="shgo"`: `n_init` (number of initial points), `sampling_method="halton"`,
         * for `method="smbo"`: `n_init`, `n_candidates`, `n_models`, `estimator`
           (for explanation, see class `sambo.Optimizer`),
         * for `method="sceua"`: `n_complexes`, `complex_size` (as in [SCE-UA] algorithm),

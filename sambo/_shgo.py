@@ -168,11 +168,13 @@ def shgo(
     minimizer_kwargs['options'].setdefault('ftol', tol)
     minimizer_kwargs['options'].setdefault('disp', disp)
 
+    sampling_method = kwargs.pop('sampling_method', None)
+    sampler = ConstrainedHaltonSampler(bounds=bounds, constraints=constraints, x0=x0, rng=rng)
     prefer_simplicial_sampling = len(bounds) <= 10
-    sampling_method = kwargs.pop(
-        'sampling_method',
-        'simplicial' if prefer_simplicial_sampling else
-        ConstrainedHaltonSampler(bounds=bounds, constraints=constraints, x0=x0, rng=rng))
+    if sampling_method is None:
+        sampling_method = 'simplicial' if prefer_simplicial_sampling else sampler
+    elif sampling_method == 'halton':
+        sampling_method = sampler
 
     if n_init is None:
         if prefer_simplicial_sampling:
