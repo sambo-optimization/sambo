@@ -32,7 +32,7 @@ from ._space import Space
 from ._util import OptimizeResult, _SklearnLikeRegressor
 
 _MARKER_SEQUENCE = 'osxdvP^'
-_DEFAULT_SUBPLOT_SIZE = 2.1
+_DEFAULT_SUBPLOT_SIZE = 1.7
 
 
 def plot_convergence(
@@ -247,7 +247,7 @@ def _format_scatter_plot_axes(fig, axs, space, plot_dims=None, dim_labels=None, 
         dim_labels = [fr"$\mathbf{{x_{{{i}}}}}$" for i in plot_dims]
 
     nticks = int((1 + np.log10(size / (base_figsize := _DEFAULT_SUBPLOT_SIZE))) * (base_nticks := 6))  # noqa: F841
-    fontsize = 10
+    fontsize = 8
 
     _MaxNLocator = partial(MaxNLocator, nbins=nticks)
     _FixedLocator = partial(FixedLocator, nbins=nticks)
@@ -262,7 +262,7 @@ def _format_scatter_plot_axes(fig, axs, space, plot_dims=None, dim_labels=None, 
                 continue
 
             # Set xlim, ylim, locator, formatter
-            ax.tick_params(axis='both', which='major', labelsize=fontsize - 3)
+            ax.tick_params(axis='both', which='major', labelsize=fontsize - 2)
             ax.set_xlim(*_get_lim('x', bounds, j))
             ax.set_ylim(*_get_lim('y', bounds, i))
             if space._is_cat(j):
@@ -288,14 +288,14 @@ def _format_scatter_plot_axes(fig, axs, space, plot_dims=None, dim_labels=None, 
                 # Leftmost column gets ylabels
                 if j == 0:
                     ax.tick_params(axis='y', pad=2)
-                    ax.set_ylabel(dim_labels[_i], fontsize=fontsize, labelpad=0)
+                    ax.set_ylabel(dim_labels[_i], fontsize=fontsize, fontweight='bold', labelpad=1)
                 else:
                     ax.set_yticklabels([])
 
                 # Bottom row gets xlabels
                 if i == n_dims - 1:
                     ax.tick_params(axis='x', labelrotation=45, pad=2)
-                    ax.set_xlabel(dim_labels[_j], fontsize=fontsize, labelpad=0)
+                    ax.set_xlabel(dim_labels[_j], fontsize=fontsize, fontweight='bold', labelpad=1)
                 else:
                     ax.set_xticklabels([])
 
@@ -308,7 +308,7 @@ def _format_scatter_plot_axes(fig, axs, space, plot_dims=None, dim_labels=None, 
                 ax.xaxis.set_label_position('top')
                 ax.xaxis.tick_top()
                 ax.tick_params(axis='x', labelrotation=45, bottom=True, labelbottom=i == n_dims - 1, pad=2)
-                ax.set_xlabel(dim_labels[_i], fontsize=fontsize, labelpad=4)
+                ax.set_xlabel(dim_labels[_i], fontsize=fontsize, fontweight='bold', labelpad=4)
                 # Buggy in matplotlib<=3.10 (https://github.com/matplotlib/matplotlib/pull/28629),
                 # but needed to ignore top xlabels in constrained layout computation,
                 # except for the top-most xlabel which otherwise collides with figure title.
@@ -441,9 +441,14 @@ def _subplots_grid(n_dims, size, title):
     )
     _watermark(fig)
     if add_figure_title:
-        fig.suptitle(title)
-    margins = dict(left=(m := 3 / n_dims * size / _DEFAULT_SUBPLOT_SIZE * .07), bottom=m, right=1 - m,
-                   top=1 - (2 if add_figure_title else 1.1) * m)
+        fig.suptitle(title, fontsize=10)
+    scale_factor = (2 / n_dims) * (size / _DEFAULT_SUBPLOT_SIZE)
+    margins = dict(
+        left=scale_factor * .12,
+        bottom=scale_factor * .12,
+        right=1 - scale_factor * .08,
+        top=1 - (.19 if add_figure_title else .13) * scale_factor
+    )
     fig.subplots_adjust(**margins, hspace=.1, wspace=.1)
     return fig, axs
 
@@ -642,7 +647,7 @@ def plot_objective(
                     x, y = x_samples[:, j], x_samples[:, i]
                     if jitter:
                         x, y = _maybe_jitter(jitter, (j, x), (i, y), space=space)
-                    ax.scatter(x, y, c='k', s=12, lw=0, alpha=.4)
+                    ax.scatter(x, y, c='k', s=12, lw=0, alpha=.5)
 
     _format_scatter_plot_axes(fig, axs, space, plot_dims=plot_dims, dim_labels=names, size=size)
     return fig
