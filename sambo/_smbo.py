@@ -151,7 +151,7 @@ class Optimizer:
         assert max_iter >= n_init, (max_iter, n_init)
 
         if n_candidates is None:
-            n_candidates = max(1, int(np.log2(len(bounds))))
+            n_candidates = max(1, int(np.log10(len(bounds))))
 
         if estimator is None or isinstance(estimator, str):
             from sambo._estimators import _estimator_factory
