@@ -1,3 +1,4 @@
+import warnings
 from numbers import Integral, Real
 from typing import Literal, Optional
 
@@ -9,11 +10,10 @@ except ImportError:
     raise ImportError(
         'Missing package sklearn. Please install scikit-learn '
         '(`pip install scikit-learn`).') from None
-from sklearn.ensemble import (
-    ExtraTreesRegressor,
-    GradientBoostingRegressor,
-)
-from sklearn.gaussian_process import GaussianProcessRegressor
+from sklearn.ensemble import ExtraTreesRegressor, GradientBoostingRegressor
+from sklearn.exceptions import ConvergenceWarning
+from sklearn.gaussian_process import GaussianProcessRegressor as _GaussianProcessRegressor
+from sklearn.gaussian_process.kernels import ConstantKernel, RBF
 from sklearn.model_selection._search import BaseSearchCV
 
 from sambo._util import _SklearnLikeRegressor, lru_cache
@@ -47,6 +47,17 @@ class _RegressorWithStdMixin:
         return y_pred, std
 
 
+class GaussianProcessRegressor(_GaussianProcessRegressor):
+    def fit(self, X, y):
+        with warnings.catch_warnings(action='ignore', category=ConvergenceWarning):
+            return super().fit(X, y)
+
+    def predict(self, X, **kwargs):
+        with warnings.catch_warnings():
+            warnings.filterwarnings('ignore', 'Predicted variances smaller than 0', UserWarning)
+            return super().predict(X, **kwargs)
+
+
 class ExtraTreesRegressorWithStd(_RegressorWithStdMixin, ExtraTreesRegressor):
     """
     Like `ExtraTreesRegressor` from scikit-learn, but with
@@ -75,6 +86,9 @@ def _estimator_factory(estimator, bounds, rng):
 
     if estimator == 'gp':
         return GaussianProcessRegressor(
+            kernel=(ConstantKernel(constant_value=1, constant_value_bounds=(1e-1, 1e1)) *
+                    RBF(length_scale=np.repeat(1, len(bounds)), length_scale_bounds=(1e-2, 1e2))),
+            alpha=1e-14,
             copy_X_train=False,
             normalize_y=True,
             random_state=rng,
