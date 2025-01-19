@@ -1,11 +1,13 @@
 import heapq
 from functools import lru_cache as _lru_cache, wraps
+from itertools import islice
 from numbers import Integral, Real
 from threading import Lock
 from typing import Any, Callable, Optional, Protocol, runtime_checkable
 
 import numpy as np
 from scipy.optimize import Bounds, NonlinearConstraint, OptimizeResult as _OptimizeResult
+from scipy.stats import gaussian_kde
 from scipy.stats.qmc import LatinHypercube
 
 FLOAT32_PRECISION = 10**-np.finfo(np.float32).precision
@@ -276,3 +278,32 @@ def _sanitize_constraints(constraints):
                 def constraints(x, *, _c=constraints['fun']):
                     return _c(x) == 0
     return constraints
+
+
+def weighted_uniform_sampling(kde, bounds, size, constraints, rng):
+    """Sample points from a weighted density within given bounds"""
+    rng = _check_random_state(rng)
+    lb, ub = np.array(bounds).T
+    if constraints is None:
+        def constraints(_):
+            return True
+    try:
+        points = np.array(
+            list(islice(
+                (x for _ in range(1000)
+                 for x in kde.resample(size, seed=rng).T
+                 if constraints(x) and np.all((lb <= x) & (x <= ub))),
+                size)))
+    except ValueError as ex:
+        if 'too short' in str(ex):
+            raise RuntimeError('Constraints seemingly cannot be satisfied.')
+        raise
+    return points
+
+
+def recompute_kde(X, y):
+    w = np.max(y) - y
+    w /= np.sum(w)
+    w **= 3
+    kde = gaussian_kde(X.T, bw_method='silverman', weights=w)
+    return kde

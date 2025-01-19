@@ -11,7 +11,7 @@ from sambo._util import (
     _initialize_population,
     _sample_population,
     _check_bounds,
-    _check_random_state, _sanitize_constraints, lru_cache,
+    _check_random_state, _sanitize_constraints, lru_cache, recompute_kde, weighted_uniform_sampling,
 )
 
 
@@ -117,7 +117,7 @@ class Optimizer:
             max_iter: int = INT32_MAX,
             n_init: Optional[int] = None,
             n_candidates: Optional[int] = None,
-            n_iter_no_change: int = 10,
+            n_iter_no_change: int = 5,
             n_models: int = 1,
             tol: float = FLOAT32_PRECISION,
             estimator: Literal['gp', 'et', 'gb'] | _SklearnLikeRegressor = None,
@@ -147,7 +147,9 @@ class Optimizer:
         rng = _check_random_state(rng)
 
         if n_init is None:
-            n_init = 0 if not callable(fun) else min(max(1, max_iter - 20), 150 * len(bounds))
+            n_init = (0 if not callable(fun) else
+                      min(max(1, max_iter - 20),
+                          int(40 * len(bounds) * max(1, np.log2(len(bounds))))))
         assert max_iter >= n_init, (max_iter, n_init)
 
         if n_candidates is None:
@@ -200,6 +202,9 @@ class Optimizer:
         self._X = X
         self._y = y
         assert len(X) == len(y), (X, y)
+
+        self._kde = None
+        self._prev_y_min = np.inf
 
         # Cache methods on the _instance_
         self._init_once = lru_cache(1)(self._init_once)
@@ -334,8 +339,18 @@ class Optimizer:
         assert isinstance(kappa, (Real, Iterable)), kappa
         self._init_once()
 
-        n_points = max(10_000, 1000 * int(len(self.bounds)**1.2))
-        X = _sample_population(self.bounds, n_points, self.constraints, self.rng)
+        n_points = min(80_000, 20_000 * int(len(self.bounds)**2))  # TODO: Make this a param?
+        nfev = len(self._X)
+        if nfev < 10 * len(self.bounds)**2:
+            X = _sample_population(self.bounds, n_points, self.constraints, self.rng)
+        else:
+            y_min = np.min(self._y)
+            if self._kde is None or (nfev < 200 or nfev % 5 == 0 or y_min < self._prev_y_min):
+                self._prev_y_min = y_min
+                self._kde = recompute_kde(np.array(self._X), np.array(self._y))
+            X = weighted_uniform_sampling(
+                self._kde, self.bounds, n_points, self.constraints, self.rng)
+
         X, mean, std = self._predict(X)
         criterion = acq_func(mean=mean, std=std, kappa=kappa)
         n_candidates = min(n_candidates, criterion.shape[1])
@@ -552,7 +567,7 @@ def smbo(
         max_iter: int = INT32_MAX,
         n_init: Optional[int] = None,
         n_candidates: Optional[int] = None,
-        n_iter_no_change: int = 10,
+        n_iter_no_change: int = 5,
         n_models: int = 1,
         tol: float = FLOAT32_PRECISION,
         estimator: Optional[str | _SklearnLikeRegressor] = None,

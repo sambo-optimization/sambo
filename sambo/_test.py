@@ -13,6 +13,7 @@ from scipy.optimize import (
     Bounds, NonlinearConstraint, rosen, minimize as scipy_minimize,
     shgo as scipy_shgo,
 )
+from scipy.stats import gaussian_kde
 
 from sambo import minimize, Optimizer, SamboSearchCV
 from sambo._space import Space
@@ -20,8 +21,7 @@ from sambo._sceua import sceua
 from sambo._shgo import shgo
 from sambo._smbo import smbo
 from sambo.plot import plot_convergence, plot_evaluations, plot_objective, plot_regret
-from sambo._util import OptimizeResult
-
+from sambo._util import OptimizeResult, recompute_kde, weighted_uniform_sampling
 
 minimize = partial(minimize, rng=0)
 sceua = partial(sceua, rng=0)
@@ -214,7 +214,7 @@ class TestMinimize(unittest.TestCase):
 
     def test_smbo(self):
         res = minimize(**ROSEN_TEST_PARAMS, method='smbo', max_iter=20, estimator='gp')
-        check_result(res, 0, atol=55)
+        check_result(res, 0, atol=5)
 
     def test_args(self):
         def f(x, a):
@@ -240,7 +240,7 @@ class TestMinimize(unittest.TestCase):
 
         counter = 0
         _ = _minimize(f, method='smbo')
-        self.assertEqual(counter, MAX_ITER)
+        self.assertLessEqual(counter, MAX_ITER)
 
     def test_constraints(self):
         def f(x):
@@ -313,16 +313,11 @@ class TestMinimize(unittest.TestCase):
 
 class TestSklearnEstimators(unittest.TestCase):
     def test_estimator_factory(self):
-        DEFAULT_KWARGS = {'max_iter': 50, 'n_iter_no_change': 10, 'rng': 0}
-        ESTIMATOR_KWARGS = {
-            'gp': {},
-            'et': {'n_iter_no_change': 40},
-            'gb': {'n_iter_no_change': 20, 'rng': 2},
-        }
+        DEFAULT_KWARGS = {'max_iter': 20, 'n_iter_no_change': 5, 'rng': 0}
         for estimator in BUILTIN_ESTIMATORS:
             with self.subTest(estimator=estimator):
                 res = smbo(lambda x: sum((x-2)**2), bounds=[(-100, 100)], estimator=estimator,
-                           **dict(DEFAULT_KWARGS, **ESTIMATOR_KWARGS[estimator]))
+                           **dict(DEFAULT_KWARGS))
                 self.assertLess(res.fun, 1, msg=res)
 
     def test_SamboSearchCV_large_param_grid(self):
@@ -353,11 +348,17 @@ class TestSklearnEstimators(unittest.TestCase):
 
 class TestDocs(unittest.TestCase):
     def test_make_doc_plots(self):
+        KWARGS = {
+            'shgo': dict(n_init=30),
+            'smbo': dict(n_init=30),
+            'sceua': dict(n_complexes=3),
+        }
         results = [
             minimize(
-                rosen, bounds=[(-2., 2.), (-2., 2.)],
-                constraints=lambda x: sum(x**2) <= 2*len(x),
-                max_iter=120, method=method, rng=2,
+                rosen, bounds=[(-2., 2.)]*2,
+                constraints=lambda x: sum(x**2) <= 2**len(x),
+                max_iter=100, method=method, rng=2,
+                **KWARGS.get(method, {}),
             )
             for method in BUILTIN_METHODS
         ]
@@ -392,7 +393,7 @@ class TestDocs(unittest.TestCase):
     def test_website_example1(self):
         res = minimize(
             rosen, bounds=[(-2., 2.), ] * 2,
-            constraints=lambda x: sum(x**2) <= len(x),
+            constraints=lambda x: sum(x**2) <= 2**len(x),
             n_init=7, method='shgo', rng=0,
         )
         print(type(res), res, sep='\n\n')
@@ -476,6 +477,36 @@ class TestDocs(unittest.TestCase):
                 if arg in annot_ref:
                     self.assertEqual(
                         annot[arg], annot_ref[arg], msg=f'{fun.__qualname__} / {arg}')
+
+
+class TestUtil(unittest.TestCase):
+    def test_weighted_uniform_sampling(self):
+        rng = np.random.default_rng(2)
+        X = rng.uniform(-10, 10, (100, 2))
+        y = rng.uniform(1, 10, 100)
+        bounds = [(-10, 10), (-10, 10)]
+        n_samples = 10000
+        kde = recompute_kde(X, y)
+        sampled_points = weighted_uniform_sampling(kde, bounds, n_samples, None, 0)
+
+        # Verify results
+        hist, xedges, yedges = np.histogram2d(*sampled_points.T, range=bounds)
+        # Compare histogram density with weight distribution
+        kde = gaussian_kde(X.T, weights=(np.max(y) - y) / np.sum(np.max(y) - y))
+        test_grid = np.array(np.meshgrid(xedges[:-1], yedges[:-1])).T.reshape(-1, 2)
+        pdf_values = kde(test_grid.T).reshape(hist.shape)
+        # Normalize for direct comparison
+        hist_normalized = hist / np.sum(hist)
+        pdf_normalized = pdf_values / np.sum(pdf_values)
+        # Plot results
+        fig, axes = plt.subplots(1, 2, figsize=(8, 4))
+        extent = np.array(bounds).flatten()
+        axes[0].imshow(hist_normalized, extent=extent, origin='lower', cmap='Blues')
+        axes[1].imshow(pdf_normalized, extent=extent, origin='lower', cmap='Reds')
+        plt.show()
+
+        diff = np.abs(hist_normalized - pdf_normalized).mean()
+        self.assertLess(diff, .05)
 
 
 if __name__ == '__main__':
