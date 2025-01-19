@@ -226,7 +226,7 @@ class Optimizer:
         estimator = self.estimator
         if self.n_models > 1 and hasattr(estimator, 'random_state'):
             estimator = clone(self.estimator)
-            estimator.random_state = np.random.randint(10000000)
+            estimator.random_state = self.rng.randint(10000000)
         estimator.fit(self._X, self._y)
 
         self.estimators.append(estimator)
@@ -238,12 +238,14 @@ class Optimizer:
     def _predict(self, X):
         means, stds, masks = [], [], []
         for estimator in self.estimators:
+            X_batched = [X[i:i+10_000] for i in range(0, len(X), 10_000)]
             try:
-                mean, std = estimator.predict(X, return_std=True)
+                mean, std = np.concatenate(
+                    [estimator.predict(X, return_std=True) for X in X_batched], axis=1)
             except TypeError as exc:
                 if 'return_std' not in exc.args[0]:
                     raise
-                mean, std = estimator.predict(X), 0
+                mean, std = np.concatenate([estimator.predict(X) for X in X_batched]), 0
                 mask = np.ones_like(mean, dtype=bool)
             else:
                 # Only suggest new/unknown points
@@ -336,7 +338,11 @@ class Optimizer:
         X = _sample_population(self.bounds, n_points, self.constraints, self.rng)
         X, mean, std = self._predict(X)
         criterion = acq_func(mean=mean, std=std, kappa=kappa)
-        best_indices = np.argsort(criterion)[:, :n_candidates].flatten('F')
+        n_candidates = min(n_candidates, criterion.shape[1])
+        best_indices = np.take_along_axis(
+            partitioned_inds := np.argpartition(criterion, n_candidates - 1)[:, :n_candidates],
+            np.argsort(np.take_along_axis(criterion, partitioned_inds, axis=1)),
+            axis=1).flatten('F')
         X = X[best_indices]
         X = X[:n_candidates]
         self._X_ask.extend(map(tuple, X))

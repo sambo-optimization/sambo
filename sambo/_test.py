@@ -409,7 +409,7 @@ class TestDocs(unittest.TestCase):
             optimizer = Optimizer(fun=None, bounds=[(-2, 2)]*4, estimator=estimator, rng=0)
 
             for i in range(30):
-                suggested_x = optimizer.ask(n_candidates=2)
+                suggested_x = optimizer.ask(n_candidates=1)
                 y = [evaluate(x) for x in suggested_x]
                 optimizer.tell(y)
 
