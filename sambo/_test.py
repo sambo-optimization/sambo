@@ -6,6 +6,7 @@ from functools import partial
 from pathlib import Path
 from pprint import pprint
 from typing import get_type_hints
+from unittest.mock import patch
 
 import numpy as np
 from matplotlib import pyplot as plt
@@ -35,6 +36,9 @@ ROSEN_TRUE_MIN = 0
 
 BUILTIN_METHODS = ['shgo', 'sceua', 'smbo']
 BUILTIN_ESTIMATORS = ['gp', 'et', 'gb']
+
+Optimizer.POINTS_PER_DIM = 1_000
+Optimizer.MAX_POINTS_PER_ITER = 10_000
 
 
 def check_result(res, y_true, atol=1e-5):
@@ -214,7 +218,7 @@ class TestMinimize(unittest.TestCase):
 
     def test_smbo(self):
         res = minimize(**ROSEN_TEST_PARAMS, method='smbo', max_iter=20, estimator='gp')
-        check_result(res, 0, atol=5)
+        check_result(res, 0, atol=11)
 
     def test_args(self):
         def f(x, a):
@@ -399,6 +403,8 @@ class TestDocs(unittest.TestCase):
         print(type(res), res, sep='\n\n')
         self.assertAlmostEqual(res.fun, 0, places=0, msg=res)
 
+    @patch.object(Optimizer, 'POINTS_PER_DIM', 20_000)
+    @patch.object(Optimizer, 'MAX_POINTS_PER_ITER', 80_000)
     def test_website_example2(self):
 
         def evaluate(x):

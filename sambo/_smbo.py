@@ -339,7 +339,8 @@ class Optimizer:
         assert isinstance(kappa, (Real, Iterable)), kappa
         self._init_once()
 
-        n_points = min(80_000, 20_000 * int(len(self.bounds)**2))  # TODO: Make this a param?
+        n_points = min(self.MAX_POINTS_PER_ITER,
+                       self.POINTS_PER_DIM * int(len(self.bounds)**2))  # TODO: Make this a param?
         nfev = len(self._X)
         if nfev < 10 * len(self.bounds)**2:
             X = _sample_population(self.bounds, n_points, self.constraints, self.rng)
@@ -362,6 +363,9 @@ class Optimizer:
         X = X[:n_candidates]
         self._X_ask.extend(map(tuple, X))
         return X
+
+    POINTS_PER_DIM = 20_000
+    MAX_POINTS_PER_ITER = 80_000
 
     def tell(self, y: float | list[float],
              x: Optional[float | tuple[float] | list[tuple[float]]] = None):
