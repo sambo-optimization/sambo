@@ -318,10 +318,15 @@ class TestMinimize(unittest.TestCase):
 class TestSklearnEstimators(unittest.TestCase):
     def test_estimator_factory(self):
         DEFAULT_KWARGS = {'max_iter': 20, 'n_iter_no_change': 5, 'rng': 0}
+        ESTIMATOR_KWARGS = {
+            'gp': {},
+            'et': {'max_iter': 40, 'n_iter_no_change': 10},
+            'gb': {},
+        }
         for estimator in BUILTIN_ESTIMATORS:
             with self.subTest(estimator=estimator):
                 res = smbo(lambda x: sum((x-2)**2), bounds=[(-100, 100)], estimator=estimator,
-                           **dict(DEFAULT_KWARGS))
+                           **dict(DEFAULT_KWARGS, **ESTIMATOR_KWARGS[estimator]))
                 self.assertLess(res.fun, 1, msg=res)
 
     def test_SamboSearchCV_large_param_grid(self):
