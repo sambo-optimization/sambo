@@ -1,6 +1,7 @@
 [![SAMBO - Sequential And Model-Based Optimization](logo.svg)](https://sambo-optimization.github.io/)
 =====
 [![Build Status](https://img.shields.io/github/actions/workflow/status/sambo-optimization/sambo/ci.yml?branch=master&style=for-the-badge)](https://github.com/sambo-optimization/sambo/actions)
+[![Code Coverage](https://img.shields.io/badge/coverage-96%25-%2397ca00?style=for-the-badge)](https://github.com/sambo-optimization/sambo/actions/workflows/ci.yml)
 [![sambo on PyPI](https://img.shields.io/pypi/v/sambo.svg?color=blue&style=for-the-badge)](https://pypi.org/project/sambo)
 [![package downloads](https://img.shields.io/pypi/dm/sambo.svg?color=skyblue&style=for-the-badge)](https://pypi.org/project/sambo)
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/kernc?color=pink&style=for-the-badge)](https://github.com/sponsors/kernc)
