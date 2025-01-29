@@ -6,6 +6,7 @@ from itertools import groupby
 import hyperopt
 import nevergrad
 import numpy as np
+import optuna
 import scipy
 import scipy.optimize as scipy_optimize
 import sklearn
@@ -23,7 +24,7 @@ from .methods import (  # noqa: F401
     SCIPY_OPTIMIZE_GLOBAL_OPTIMIZATION_CONSTRAINED_METHODS,
     SCIPY_OPTIMIZE_GLOBAL_OPTIMIZATION_NONCONSTRAINED_METHODS,
     SCIPY_OPTIMIZE_NONCONSTRAINED_METHODS,
-    _minimize_nevergrad, _minimize_hyperopt, _minimize_skopt,
+    _minimize_nevergrad, _minimize_hyperopt, _minimize_optuna, _minimize_skopt,
 )
 from .funcs import TEST_FUNCTIONS
 
@@ -86,6 +87,7 @@ def main():
         ('scikit-optimize', skopt.__version__),
         ('hyperopt', hyperopt.__version__),
         ('nevergrad', nevergrad.__version__),
+        ('optuna', optuna.__version__),
         ('sambo', sambo.__version__),
     ]:
         print(pkg, version)

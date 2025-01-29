@@ -1,3 +1,5 @@
+import logging
+
 import numpy as np
 import skopt
 from scipy.optimize import OptimizeResult
@@ -46,6 +48,7 @@ OPTIMIZERS_3RD_PARTY = {
     'nevergrad': '_minimize_nevergrad',  # https://facebookresearch.github.io/nevergrad/
     'hyperopt': '_minimize_hyperopt',  # https://hyperopt.github.io/hyperopt/
     'scikit-optimize': '_minimize_skopt',  # https://github.com/scikit-optimize/scikit-optimize/
+    'Optuna': '_minimize_optuna',  # https://optuna.org
     # The following packages were considered:
     # https://open-box.readthedocs.io -- too slow
     # https://github.com/SMTorg/smt   -- too complex
@@ -144,4 +147,51 @@ def _minimize_skopt(fun, x0, *, bounds=None, constraints=None, **kwargs):
     res['message'] = 'mock success'
     res['nfev'] = len(res.x_iters)
     res['success'] = True
+    return res
+
+
+def _minimize_optuna(fun, x0, *, bounds=None, constraints=None, **kwargs):
+    if bounds is None:
+        bounds = [(-np.inf, np.inf) for _ in range(len(x0))]
+
+    def objective(trial):
+        nonlocal bounds, fun
+        x = np.array([trial.suggest_float(f'x{i}', *b)
+                      for i, b in enumerate(bounds)])
+        return fun(x)
+
+    import optuna
+
+    class StopWhenNoImprovementCallback:
+        def __init__(self, thresh: int):
+            self.thresh = thresh
+            self._count = 0
+            self._best_value = np.inf
+
+        def __call__(self, study: optuna.study.Study, trial: optuna.trial.FrozenTrial) -> None:
+            if trial.value < self._best_value:
+                self._count = 0
+                self._best_value = trial.value
+            else:
+                self._count += 1
+            if self._count >= self.thresh:
+                study.stop()
+
+    logging.getLogger('optuna.study.study').disabled = True
+
+    if constraints is not None:
+        def constraints(trial: optuna.trial.FrozenTrial, _c=constraints):
+            return [0] if _c(np.array(list(trial.params.values()))) else [np.inf]
+
+    study = optuna.create_study(
+        direction='minimize',
+        sampler=optuna.samplers.TPESampler(seed=0, constraints_func=constraints))
+    study.optimize(objective, n_trials=3000, callbacks=[StopWhenNoImprovementCallback(150)], n_jobs=1)
+    res = OptimizeResult(
+        message='Ok',
+        success=True,
+        nfev=len(study.trials),
+        x=list(study.best_params.values()),
+        fun=study.best_value,
+    )
     return res
