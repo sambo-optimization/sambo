@@ -364,7 +364,12 @@ class Optimizer:
         self._X_ask.extend(map(tuple, X))
         return X
 
+    #: In `Optimizer.ask()`, sample this many points (per dimension) and
+    #: use the estimator to _predict_ the objective values.
     POINTS_PER_DIM = 20_000
+
+    #: In `Optimizer.ask()`, sample _at most_ this many points. This increases
+    #: computation time, but may also improve precision and convergence significantly.
     MAX_POINTS_PER_ITER = 80_000
 
     def tell(self, y: float | list[float],
