@@ -114,7 +114,8 @@ class SamboSearchCV(BaseSearchCV):
     SAMBO hyper-parameter search with cross-validation that can be
     used to **optimize hyperparameters of machine learning estimator pipelines**
     like those of scikit-learn.
-    Similar to `GridSearchCV` from scikit-learn,
+    **Similar to `BayesSearchCV`** from _scikit-optimize_ or
+    `GridSearchCV` from _scikit-learn_,
     but hopefully **much faster for large parameter spaces**.
 
     Parameters

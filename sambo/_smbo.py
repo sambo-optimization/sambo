@@ -15,7 +15,7 @@ from sambo._util import (
 )
 
 
-def _UCB(*, mean, std, kappa): return mean - np.outer(kappa, std)
+def _LCB(*, mean, std, kappa): return mean - np.outer(kappa, std)
 
 
 class Optimizer:
@@ -271,21 +271,22 @@ class Optimizer:
 
     #: Acquisition functions for selecting the best candidates from the sample.
     #: Currently defined keys:
-    #:     "UCB" for upper confidence bound (`mean - kappa * std`).
+    #: `"LCB"` — **lower confidence bound** (an inverse analog of "UCB")
+    #: which orders candidates by `mean - kappa * std`.
     #: [//]: # (No blank line here! bug in pdoc)
     #: .. note::
     #:      To make any use of the `kappa` parameter, it is important for the
     #:      estimator's `predict()` method to implement `return_std=` behavior.
     #:      All built-in estimators (`"gp"`, `"et"`, `"gb"`) do so.
     ACQ_FUNCS: dict = {
-        'UCB': _UCB,
+        'LCB': _LCB,
     }
 
     def ask(
             self,
             n_candidates: Optional[int] = None,
             *,
-            acq_func: Optional[Callable] = ACQ_FUNCS['UCB'],
+            acq_func: Optional[Callable] = ACQ_FUNCS['LCB'],
             kappa: float | list[float] = 0,
     ) -> np.ndarray:
         """
@@ -298,20 +299,20 @@ class Optimizer:
             Number of candidate solutions to propose.
             If not specified, the default value set during initialization is used.
 
-        acq_func : Callable, default ACQ_FUNCS['UCB']
+        acq_func : Callable, default ACQ_FUNCS['LCB']
             Acquisition function used to guide the selection of candidate solutions.
-            By default, upper confidence bound (i.e. `mean - kappa * std` where `mean`
+            By default, lower confidence bound (i.e. `mean - kappa * std` where `mean`
             and `std` are surrogate models' predicted results).
 
             .. tip::
-                [See the source][_ghs] for how `ACQ_FUNCS['UCB']` is implemeted.
+                [See the source][_ghs] for how `ACQ_FUNCS['LCB']` is implemeted.
                 The passed parameters are open to extension to accommodate
                 alternative acquisition functions.
 
                 [_ghs]: https://github.com/search?q=repo%3Asambo-optimization%2Fsambo%20ACQ_FUNCS&type=code
 
         kappa : float or list[float], default 0
-            The upper/lower-confidence-bound parameter, used by `acq_func`, that
+            The lower-confidence-bound parameter, used by `acq_func`, that
             balances exploration (<0) vs exploitation (>0).
 
             Can also be an array of values to use sequentially for `n_cadidates`.
