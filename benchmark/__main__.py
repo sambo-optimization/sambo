@@ -139,9 +139,9 @@ def main():
     for method, nfev, success_pct, error, duration in sorted(
             [(k,
               int(round(np.mean([r['nfev'] for r in g]))),
-              int(np.round(100 * np.mean([r['success'] * 1. for r in g]))),
+              int(round(100 * np.mean([int(r['success']) for r in g]))),
               int(round(np.mean([r['error'] for r in g]))),
-              np.percentile([r['duration'] for r in g], 90),
+              np.median([r['duration'] for r in g]),
               )
              for k, g in [(k, list(g)) for k, g in groupby(sorted(results, key=key_func), key=key_func)]],
             key=lambda g: (-g[2], g[1], g[3])):
