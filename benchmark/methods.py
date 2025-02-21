@@ -74,8 +74,8 @@ def _minimize_nevergrad(fun, x0, *, bounds=None, constraints=None):
         instrumentation_params = ng.p.Array(init=x0)
     instrumentation = ng.p.Instrumentation(instrumentation_params)
 
-    optimizer = ng.optimizers.registry["NgIohTuned"](instrumentation, budget=2000)
-    optimizer.register_callback('ask', ng.callbacks.EarlyStopping.no_improvement_stopper(1000))
+    optimizer = ng.optimizers.registry["NgIohTuned"](instrumentation, budget=3000)
+    optimizer.register_callback('ask', ng.callbacks.EarlyStopping.no_improvement_stopper(300))
 
     def objective_with_nevergrad_expected_signature(*args):
         return fun(args[0], *args[1:])
@@ -116,7 +116,8 @@ def _minimize_hyperopt(fun, x0, *, bounds=None, constraints=None, **kwargs):
     best = fmin(fn=constrained_fun, space=space, trials=trials,
                 algo=kwargs.get("algo", tpe.suggest),
                 max_evals=kwargs.get("max_evals", 3000),
-                early_stop_fn=no_progress_loss(500))
+                early_stop_fn=no_progress_loss(500),
+                rstate=np.random.default_rng(0))
     result = OptimizeResult(
         x=best,
         fun=trials.best_trial['result']['loss'],
@@ -139,11 +140,11 @@ def _minimize_skopt(fun, x0, *, bounds=None, constraints=None, **kwargs):
     #     verbose=True,
     #     callback=[DeltaYStopper(1e-1, 5), DeltaXStopper(.01)])
     res = skopt.forest_minimize(
-        lambda x: fun(np.array(x)), bounds, n_calls=800,
+        lambda x: fun(np.array(x)), bounds, n_calls=3000,
         space_constraint=constraints and (lambda x: constraints(np.array(x))),
         n_initial_points=50 * len(bounds),
         verbose=True,
-        callback=HollowIterationsStopper(100, .1))
+        callback=HollowIterationsStopper(150, .1))
     res['message'] = 'mock success'
     res['nfev'] = len(res.x_iters)
     res['success'] = True
