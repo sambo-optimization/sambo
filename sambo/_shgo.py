@@ -128,10 +128,10 @@ def shgo(
 
     Examples
     --------
-    >>> from sambo import shgo
+    >>> from sambo import minimize
     >>> def objective_func(x):
     ...     return sum(x**2)
-    >>> result = shgo(fun=objective_func, bounds=[(-5, 5), (-5, 5)])
+    >>> result = minimize(objective_func, bounds=[(-5, 5), (-5, 5)], method='shgo')
     """
     bounds, x0, y0 = _check_bounds(bounds, x0, y0)
     rng = _check_random_state(rng)

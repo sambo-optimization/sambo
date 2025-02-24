@@ -305,5 +305,6 @@ def recompute_kde(X, y):
     w = np.max(y) - y
     w /= np.sum(w)
     w **= 3
+    assert not np.isnan(w).any(), (w, y)
     kde = gaussian_kde(X.T, bw_method='silverman', weights=w)
     return kde
