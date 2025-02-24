@@ -8,6 +8,7 @@ from scipy.optimize import NonlinearConstraint
 from sambo._util import (
     INT32_MAX, FLOAT32_PRECISION, OptimizeResult, _ObjectiveFunctionWrapper, _initialize_population,
     _sample_population, _check_bounds, _check_random_state, _sanitize_constraints,
+    symlog, symlog_inv,
 )
 
 
@@ -50,7 +51,7 @@ def _evolve_complex(func, args, population, func_values, complex_indices, bounds
             complex_values[worst_idx] = contraction_value
         else:
             n_worst = len(complex_indices) - 2  # This includes our +1 at index 0
-            x = _sample_population(bounds, n_worst, constraints, rng)
+            x = symlog_inv(_sample_population(symlog(bounds), n_worst, constraints, rng))
             complex_population[-n_worst:] = x
             complex_values[-n_worst:] = np.apply_along_axis(func, 1, x, *args)
 

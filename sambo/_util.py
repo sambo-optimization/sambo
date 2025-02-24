@@ -280,6 +280,14 @@ def _sanitize_constraints(constraints):
     return constraints
 
 
+def symlog(x, linthresh=1, log_base=10):
+    return np.sign(x) * np.log1p(np.abs(x / linthresh)) / np.log(log_base)
+
+
+def symlog_inv(y, linthresh=1, log_base=10):
+    return np.sign(y) * linthresh * np.expm1(np.abs(y) * np.log(log_base))
+
+
 def weighted_uniform_sampling(kde, bounds, size, constraints, rng):
     """Sample points from a weighted density within given bounds"""
     rng = _check_random_state(rng)
