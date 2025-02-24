@@ -49,6 +49,7 @@ OPTIMIZERS_3RD_PARTY = {
     'hyperopt': '_minimize_hyperopt',  # https://hyperopt.github.io/hyperopt/
     'scikit-optimize': '_minimize_skopt',  # https://github.com/scikit-optimize/scikit-optimize/
     'Optuna': '_minimize_optuna',  # https://optuna.org
+    'tgo': '_minimize_tgo',  # https://github.com/Stefan-Endres/tgo
     # The following packages were considered:
     # https://open-box.readthedocs.io -- too slow
     # https://github.com/SMTorg/smt   -- too complex
@@ -195,4 +196,14 @@ def _minimize_optuna(fun, x0, *, bounds=None, constraints=None, **kwargs):
         x=list(study.best_params.values()),
         fun=study.best_value,
     )
+    return res
+
+
+def _minimize_tgo(fun, x0, *, bounds=None, constraints=None, **kwargs):
+    if bounds is None:
+        bounds = [(-np.inf, np.inf) for _ in range(len(x0))]
+
+    from sambo._tgo import tgo
+
+    res = tgo(fun, x0, bounds=bounds, constraints=constraints, max_iter=3000)
     return res

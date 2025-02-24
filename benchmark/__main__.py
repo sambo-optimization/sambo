@@ -24,7 +24,7 @@ from .methods import (  # noqa: F401
     SCIPY_OPTIMIZE_GLOBAL_OPTIMIZATION_CONSTRAINED_METHODS,
     SCIPY_OPTIMIZE_GLOBAL_OPTIMIZATION_NONCONSTRAINED_METHODS,
     SCIPY_OPTIMIZE_NONCONSTRAINED_METHODS,
-    _minimize_nevergrad, _minimize_hyperopt, _minimize_optuna, _minimize_skopt,
+    _minimize_nevergrad, _minimize_hyperopt, _minimize_optuna, _minimize_skopt, _minimize_tgo
 )
 from .funcs import TEST_FUNCTIONS
 
