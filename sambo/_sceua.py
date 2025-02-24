@@ -26,7 +26,9 @@ def _apply_constraints(x, bounds, constraints, centroid, rng):
 def _evolve_complex(func, args, population, func_values, complex_indices, bounds, constraints, rng):
     alpha = 1
     beta = .5
-    theta = .2
+    # Higher bounds orders of magnitude => higher theta
+    theta = np.interp(np.log10(np.ptp(bounds, axis=1).max()), (2, 5), (.2, .5))
+
     best_idx, worst_idx = 0, -1  # Index 0 is best in population. We use 1 which is best of complex
 
     complex_population = population[complex_indices]
