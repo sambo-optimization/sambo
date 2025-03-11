@@ -6,6 +6,7 @@ Example
 -------
 >>> import matplotlib.pyplot as plt
 >>> from scipy.optimize import rosen
+>>> from sambo import minimize
 >>> result = minimize(rosen, bounds=[(-2, 2), (-2, 2)],
 ...                   constraints=lambda x: sum(x) <= len(x))
 >>> plot_convergence(result)

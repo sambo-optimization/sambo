@@ -13,33 +13,32 @@ The main tools in this Python optimization toolbox are:
 * **function `sambo.minimize()`**, a near drop-in replacement for [`scipy.optimize.minimize()`][sp_opt_min],
 * **class `Optimizer`** with an ask-and-tell user interface,
   supporting arbitrary scikit-learn-like surrogate models,
-  with Bayesian optimization estimators like [gaussian process] and [extra trees],
+  with **Bayesian optimization estimators like [Gaussian processes] and [Extra Trees]**
   built in,
-* **`SamboSearchCV`**, a much faster drop-in replacement for
-  scikit-learn's [`GridSearchCV`][skl_gridsearchcv] and similar exhaustive
+* **`SamboSearchCV`**, a much faster **drop-in replacement** for
+  scikit-learn's **[`GridSearchCV`][skl_gridsearchcv]** and similar exhaustive
   machine-learning hyper-parameter tuning methods,
   but compared to unpredictable stochastic methods, _informed_.
 
 The algorithms and methods implemented by or used in this package are:
 
-* [simplical homology global optimization] (SHGO), customizing the [implementation from SciPy],
-* surrogate machine learning model-based optimization,
-* [shuffled complex evolution] (SCE-UA with improvements).
+* **[simplical homology global optimization] (SHGO)**, reinitializing the [implementation from SciPy],
+* **surrogate** machine learning **model**-based optimization,
+* [shuffled complex evolution] (**SCE-UA** with improvements).
 
 [simplical homology global optimization]: http://doi.org/10.1007/s10898-018-0645-y
 [implementation from SciPy]: https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.shgo.html
 [shuffled complex evolution]: https://doi.org/10.1007/BF00939380
 
-This open-source project was heavily **inspired by _scikit-optimize_** project,
-which now seems helplessly defunct.
-
-The project is one of the better optimizers around according to [benchmark].
+This open-source project was **inspired by _scikit-optimize_**.
+The project is one of the better optimizers available according to
+[benchmark](https://sambo-optimization.github.io/#benchmark).
 
 \N{DAGGER} The contained algorithms seek to _minimize_ your objective `f(x)`.
 If you instead need the _maximum_, simply minimize `-f(x)`. 💡
 
-[gaussian process]: https://www.gaussianprocess.org/gpml/chapters/RW.pdf
-[extra trees]: https://doi.org/10.1007/s10994-006-6226-1
+[Gaussian processes]: https://www.gaussianprocess.org/gpml/chapters/RW.pdf
+[Extra Trees]: https://doi.org/10.1007/s10994-006-6226-1
 [kernel ridge regression]: https://scikit-learn.org/stable/modules/kernel_ridge.html
 [sp_opt_min]: https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.minimize.html
 [skl_gridsearchcv]: https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html

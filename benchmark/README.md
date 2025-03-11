@@ -9,3 +9,5 @@ Run in project root:
 python -m benchmark |
     tee benchmark-$(date --iso-8601=minutes).txt
 ```
+
+See [published result](https://sambo-optimization.github.io/#benchmark).
