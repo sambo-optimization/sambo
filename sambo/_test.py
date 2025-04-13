@@ -78,7 +78,7 @@ class TestSMBO(unittest.TestCase):
         np.testing.assert_array_equal(res.funv, np.arange(4))
 
     def test_multiple_runs_continue_ie_warm_start(self):
-        optimizer = Optimizer(fun=sum, x0=[0]*3, n_init=1)
+        optimizer = Optimizer(fun=sum, x0=[0] * 3, n_init=1)
         optimizer.run(max_iter=1)
         optimizer.run(max_iter=1)
         res = optimizer.run(max_iter=1)
@@ -325,7 +325,7 @@ class TestSklearnEstimators(unittest.TestCase):
         }
         for estimator in BUILTIN_ESTIMATORS:
             with self.subTest(estimator=estimator):
-                res = smbo(lambda x: sum((x-2)**2), bounds=[(-100, 100)], estimator=estimator,
+                res = smbo(lambda x: sum((x - 2)**2), bounds=[(-100, 100)], estimator=estimator,
                            **dict(DEFAULT_KWARGS, **ESTIMATOR_KWARGS[estimator]))
                 self.assertLess(res.fun, 1, msg=res)
 
@@ -364,7 +364,7 @@ class TestDocs(unittest.TestCase):
         }
         results = [
             minimize(
-                rosen, bounds=[(-2., 2.)]*2,
+                rosen, bounds=[(-2., 2.)] * 2,
                 constraints=lambda x: sum(x**2) <= 2**len(x),
                 max_iter=100, method=method, rng=2,
                 **KWARGS.get(method, {}),
@@ -418,7 +418,7 @@ class TestDocs(unittest.TestCase):
 
         results = []
         for estimator in BUILTIN_ESTIMATORS:
-            optimizer = Optimizer(fun=None, bounds=[(-2, 2)]*4, estimator=estimator, rng=0)
+            optimizer = Optimizer(fun=None, bounds=[(-2, 2)] * 4, estimator=estimator, rng=0)
 
             for i in range(30):
                 suggested_x = optimizer.ask(n_candidates=1)

@@ -15,7 +15,8 @@ from sambo._util import (
 )
 
 
-def _LCB(*, mean, std, kappa): return mean - np.outer(kappa, std)
+def _LCB(*, mean, std, kappa):
+    return mean - np.outer(kappa, std)
 
 
 class Optimizer:
@@ -243,7 +244,7 @@ class Optimizer:
     def _predict(self, X):
         means, stds, masks = [], [], []
         for estimator in self.estimators:
-            X_batched = [X[i:i+10_000] for i in range(0, len(X), 10_000)]
+            X_batched = [X[i:i + 10_000] for i in range(0, len(X), 10_000)]
             try:
                 mean, std = np.concatenate(
                     [estimator.predict(X, return_std=True) for X in X_batched], axis=1)

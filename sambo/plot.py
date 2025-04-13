@@ -92,7 +92,7 @@ def plot_convergence(
         mins = np.minimum.accumulate(result.funv)
 
         ax.plot(range(1, nfev + 1), mins,
-                label=name, marker=next(MARKER), markevery=(.05 + .05*i, .2),
+                label=name, marker=next(MARKER), markevery=(.05 + .05 * i, .2),
                 linestyle='--', alpha=.7, markersize=6, lw=2)
 
     if true_minimum is not None:
@@ -195,7 +195,7 @@ def plot_regret(
                    for i in range(1, nfev + 1)]
 
         ax.plot(range(1, nfev + 1), regrets,
-                label=name, marker=next(MARKER), markevery=(.05 + .05*i, .2),
+                label=name, marker=next(MARKER), markevery=(.05 + .05 * i, .2),
                 linestyle='--', alpha=.7, markersize=6, lw=2)
 
     if name is not None:

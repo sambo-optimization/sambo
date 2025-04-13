@@ -124,14 +124,14 @@ def main():
         return ' \N{DAGGER}' if is_nonconstrained else ''
 
     header = f'{"Test function":24s}\t{"Method":24s}\tN Evals\tError %\tDuration'.expandtabs(4)
-    print(header, '—'*len(header), sep='\n')
+    print(header, '—' * len(header), sep='\n')
     for r in sorted(results, key=lambda r: (r['func'], r['error'], r['nfev'], r['method'])):
         print(f"{r['func']:24s}\t{r['method'] + method_note(r['method']):24s}\t{str(r['nfev']):>6s}{('' if r['success'] else '*')}\t{r['error']:7d}\t{r['duration']:5.2f}".expandtabs(4))  # noqa: E501
 
     print('\n')
 
     header = f'{"Method":24s}\t{"Correct":7s}\tN Evals\tError %\tDuration'.expandtabs(4)
-    print(header, '—'*len(header), sep='\n')
+    print(header, '—' * len(header), sep='\n')
 
     def key_func(r):
         return r['method']

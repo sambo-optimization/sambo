@@ -84,8 +84,10 @@ def lru_cache(maxsize: int = 128, key: Callable = None) -> Callable:
 
 @runtime_checkable
 class _SklearnLikeRegressor(Protocol):
-    def fit(self, X, y): pass
-    def predict(self, X, return_std=False): pass
+    def fit(self, X: np.ndarray, y: np.ndarray):
+        pass
+    def predict(self, X, return_std=False):  # noqa: E301
+        pass
 
 
 class OptimizeResult(_OptimizeResult):
