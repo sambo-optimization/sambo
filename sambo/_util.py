@@ -155,7 +155,7 @@ class _ObjectiveFunctionWrapper:
             raise self.MaximumFunctionEvaluationsReached
         if self.tol is not None and len(self.funv) >= self.n_iter_no_change:
             y_min = heapq.nsmallest(self.n_iter_no_change, self.funv)
-            if y_min[0] < y_min[-1] and y_min[-1] - y_min[0] < self.tol:
+            if y_min[0] <= y_min[-1] and y_min[-1] - y_min[0] < self.tol:
                 raise self.OptimizationToleranceReached
         return y
 
