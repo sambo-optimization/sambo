@@ -48,25 +48,30 @@ def minimize(
         Bounds for parameter variables.
         Should be a sequence of (min, max) pairs for each dimension,
         or an enumeration of nominal values. For any dimension,
-        if `min` and `max` are integers, the dimension is assumed to be _integral_.
-        If `min` or `max` are floats, the dimension is assumed to be _real_.
-        In all other cases including if more than two values are provided,
-        the dimension is assumed to be an _enumeration_ of values.
+        **if `min` and `max` are integers**, the dimension is assumed to be _integral_
+        on interval `[min, max)` (see warning below).
+        If `min` or `max` are **floats**, the dimension is assumed to be _real_.
+        In all other cases including if more than two values are specified,
+        the dimension is assumed to be that ([nominal]) _enumeration_ of values.
         See _Examples_ below.
 
         .. note:: Nominals are represented as ordinals
-            Categorical (nominal) enumerations, although often not inherently ordered,
+            Categorical ([nominal]) enumerations, although often not inherently ordered,
             are internally represented as integral dimensions.
             If this appears to significantly affect your results
             (e.g. if your nominals span many cases),
             you may need to [one-hot encode] your nominal variables manually.
 
+        [nominal]: https://en.wikipedia.org/wiki/Level_of_measurement#Nominal_level
         [one-hot encode]: https://en.wikipedia.org/wiki/One-hot
 
         .. warning:: Mind the dot
             If optimizing your problem fails to produce expected results,
             make sure you're not specifying integer dimensions where real
-            floating values would make more sense.
+            (floating) values are expected. E.g.:
+
+                bounds = [(-2, 2)] * 2  # A 2D grid of {-2, -1, 0, 1}²
+                bounds = [(-2., 2.)]    # A 1D dimension of ~ np.linspace(-2., 2., 1/eps)
 
     constraints : Callable[[np.ndarray], bool], optional
         Function representing constraints.
