@@ -359,20 +359,20 @@ class TestDocs(unittest.TestCase):
     def test_make_doc_plots(self):
         KWARGS = {
             'shgo': dict(n_init=30),
-            'smbo': dict(n_init=30),
             'sceua': dict(n_complexes=3),
+            'smbo': dict(n_init=30),
         }
         results = [
             minimize(
                 rosen, bounds=[(-2., 2.)] * 2,
                 constraints=lambda x: sum(x**2) <= 2**len(x),
-                max_iter=100, method=method, rng=2,
+                max_iter=50, method=method, rng=2,
                 **KWARGS.get(method, {}),
             )
             for method in BUILTIN_METHODS
         ]
-        for res in results:
-            self.assertAlmostEqual(res.fun, 0, places=0, msg=res)
+        for i, res in enumerate(results):
+            self.assertAlmostEqual(res.fun, 0, places=0, msg=(i, res))
 
         PLOT_FUNCS = (
             plot_regret,
@@ -403,7 +403,7 @@ class TestDocs(unittest.TestCase):
         res = minimize(
             rosen, bounds=[(-2., 2.), ] * 2,
             constraints=lambda x: sum(x**2) <= 2**len(x),
-            n_init=7, method='shgo', rng=0,
+            method='shgo', rng=0,
         )
         print(type(res), res, sep='\n\n')
         self.assertAlmostEqual(res.fun, 0, places=0, msg=res)
@@ -417,10 +417,12 @@ class TestDocs(unittest.TestCase):
             return rosen(x)
 
         results = []
+        bounds = [(-2., 2.)] * 4  # 4D
         for estimator in BUILTIN_ESTIMATORS:
-            optimizer = Optimizer(fun=None, bounds=[(-2, 2)] * 4, estimator=estimator, rng=0)
+            optimizer = Optimizer(fun=None, bounds=bounds, estimator=estimator, rng=0)
 
-            for i in range(30):
+            n_iter = 50
+            for i in range(n_iter):
                 suggested_x = optimizer.ask(n_candidates=1)
                 y = [evaluate(x) for x in suggested_x]
                 optimizer.tell(y)
