@@ -110,6 +110,10 @@ def _set_xscale_yscale(ax, xscale, yscale):
         xscale = 'symlog'
         kw = {'linthresh': 1}
     ax.set_xscale(xscale, **kw)
+    if xscale == 'linear':
+        # Override for convergence and regret plots where X is nfev
+        # NOTE: Need this AFTER ax.set_xscale()
+        ax.xaxis.set_major_locator(MaxNLocator(integer=True))
     kw = {}
     if yscale in ('log', 'symlog'):
         yscale = 'symlog'
