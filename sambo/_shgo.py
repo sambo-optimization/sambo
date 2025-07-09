@@ -144,6 +144,14 @@ def shgo(
             lb=.5, ub=np.inf)
     assert constraints is None or isinstance(constraints, NonlinearConstraint)
 
+    if disp:
+        user_callback = callback
+
+        def callback(res):
+            print(f"{__package__}: SHGO nfev:{res.nfev}, fun:{np.min(res.funv):.5g}")
+            if user_callback:
+                user_callback(res)
+
     wrapper = func = _ObjectiveFunctionWrapper(
         func, args=args, max_nfev=max_iter,
         callback=callback, tol=tol, n_iter_no_change=n_iter_no_change)
