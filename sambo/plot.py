@@ -414,7 +414,7 @@ def _check_plot_dims(plot_dims, bounds) -> list[int]:
         plot_dims = np.where(bounds[:, 0] != bounds[:, 1])[0]
         if not plot_dims.size:
             raise ValueError(f'All dimensions are constant: {bounds[:, 0].tolist()}')
-    plot_dims = np.unique(plot_dims).astype(int, casting='safe')
+    plot_dims = np.unique(plot_dims).astype(np.int_, casting='safe')
     return plot_dims.tolist()
 
 
