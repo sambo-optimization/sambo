@@ -51,10 +51,10 @@ def _evolve_complex(func, args, population, func_values, complex_indices, bounds
             complex_population[worst_idx] = contraction
             complex_values[worst_idx] = contraction_value
         else:
-            n_worst = len(complex_indices) - 2  # This includes our +1 at index 0
-            x = _sample_population(bounds, n_worst, constraints, rng)
-            complex_population[-n_worst:] = x
-            complex_values[-n_worst:] = np.apply_along_axis(func, 1, x, *args)
+            # Replace worst with random point
+            x = _sample_population(bounds, 1, constraints, rng)
+            complex_population[worst_idx:] = x
+            complex_values[worst_idx:] = np.apply_along_axis(func, 1, x, *args)
 
     sorted_indices = np.argsort(complex_values)
     complex_population = complex_population[sorted_indices]
